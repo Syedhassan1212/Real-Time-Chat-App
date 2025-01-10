@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Chat App</title>
+  <style>
+
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background-color: #f7f7f7;
+    }
+
+    #chatContainer { 
+      max-width: 500px; 
+      margin: 50px auto; 
+      padding: 20px; 
+      background-color: white; 
+      border-radius: 8px; 
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+    }
+
+    h2 { 
+      text-align: center; 
+      color: #333; 
+    }
+
+    #messages { 
+      list-style-type: none; 
+      padding: 0; 
+      margin-bottom: 20px; 
+    }
+
+    #messages li { 
+      padding: 10px; 
+      background-color: #f4f4f4; 
+      margin: 5px 0; 
+      border-radius: 5px; 
+    }
+
+    input[type="text"] { 
+      width: 80%; 
+      padding: 10px; 
+      margin-right: 10px; 
+      border: 1px solid #ddd; 
+      border-radius: 5px; 
+    }
+
+    button { 
+      padding: 10px 20px; 
+      border: none; 
+      background-color: #4CAF50; 
+      color: white; 
+      border-radius: 5px; 
+      cursor: pointer; 
+    }
+
+    button:hover { 
+      background-color: #45a049; 
+    }
+    li span{
+      font-size: .8rem;
+      font-family: Arial, Helvetica, sans-serif;
+      font-style: light;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="chatContainer">
+    <h2>Real-Time Chat</h2>
+    <ul id="messages"></ul>
+    <input type="text" id="messageInput" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+   
+    const socket = io(); 
+
+    let userName = '';
+
+
+    while (!userName) {
+      userName = prompt('Enter your name:').trim();
+    }
+
+   
+    function sendMessage() {
+      const messageInput = document.getElementById('messageInput');
+      const newMessage = messageInput.value.trim();
+      if (newMessage) {
+        const timestamp = new Date().toLocaleTimeString();
+        socket.emit('chat message', { name: userName, message: newMessage, time: timestamp });
+        messageInput.value = ''; 
+      }
+    }
+
+
+    socket.on('chat message', (data) => {
+      const messagesContainer = document.getElementById('messages');
+      const li = document.createElement('li');
+      li.innerHTML = `${data.name}: ${data.message} <span>(${data.time})</span>:  `; 
+      messagesContainer.appendChild(li); 
+    });
+  </script>
+
+</body>
+</html>
